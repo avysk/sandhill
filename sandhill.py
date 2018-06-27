@@ -1,9 +1,9 @@
 """
 Sandhill emulation
 """
-import math
 import os.path
 from random import randint
+# from random import triangular
 
 import numpy as np
 import pygame as pg
@@ -12,18 +12,27 @@ import pygame.locals as lcls
 
 from pygame import surfarray as sf
 
-SIZE = 300
+SIZE = 600
 ZOOM = 1900 // SIZE
 HILL = 20
 
-WAIT = True
+# WAIT = True
+WAIT = False
 
-EVERY = 12000
-FOR = 240
+# SAVE = True
+SAVE = False
+
+SHOW_NUMBER = True
+# SHOW_NUMBER = False
+
+START = 600
+EVERY = 1200
+FOR = 60
 
 
 def _interesting(num):
-    return num % EVERY <= FOR
+    # return num <= START or num % EVERY <= FOR
+    return True
 
 
 def _update(field, border, colors):
@@ -32,6 +41,7 @@ def _update(field, border, colors):
         max_val = field.shape[0] - 1 - border
         # add one more
         rand_x = randint(border, max_val)
+        # rand_x = int(border + (max_val - border + 1) * triangular(0, 1, 1))
         rand_y = randint(border, max_val)
         field[rand_x, rand_y] += 1
         added = True
@@ -71,7 +81,10 @@ def main(size, border, zoom):
     while True:
         evt = pg.event.poll()
         # pylint:disable=no-member
-        # if evt.type == lcls.KEYDOWN and evt.key == lcls.K_SPACE:
+        if evt.type == lcls.KEYDOWN and evt.key == lcls.K_SPACE:
+            pg.image.save(surface,
+                          os.path.join("out",
+                                       "out-{:09d}.png").format(frame))
         # pylint:disable=no-member
         if evt.type == lcls.QUIT:
             raise SystemExit()
@@ -90,15 +103,18 @@ def main(size, border, zoom):
                                                        red, blue, green))
         if _interesting(grains):
             sf.blit_array(surface, colors)
-            font.render_to(surface, (10, 10), "{}".format(grains),
-                           fgcolor=(0, 255, 255),
-                           size=12)
-            pg.image.save(surface,
-                          os.path.join("out", "out-{:09d}.png").format(frame))
+            if SHOW_NUMBER:
+                font.render_to(surface, (10, 10), "{}".format(grains),
+                               fgcolor=(0, 255, 255),
+                               size=12)
+            if SAVE:
+                pg.image.save(surface,
+                              os.path.join("out",
+                                           "out-{:09d}.png").format(frame))
             frame += 1
-            # pg.transform.smoothscale(surface,
-            #                         (size * zoom, size * zoom), screen)
-            pg.transform.scale(surface, (size * zoom, size * zoom), screen)
+            pg.transform.smoothscale(surface,
+                                    (size * zoom, size * zoom), screen)
+            # pg.transform.scale(surface, (size * zoom, size * zoom), screen)
             pg.display.flip()
 
 
