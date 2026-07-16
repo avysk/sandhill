@@ -25,3 +25,7 @@ Alternatively, if you have the dependencies installed in your environment, you c
 ```bash
 python sandhill.py
 ```
+
+## Keyboard Shortcuts
+
+- `Space`: Save the current simulation frame as an image in the `out` directory (e.g., `out/out-000000001.png`).
